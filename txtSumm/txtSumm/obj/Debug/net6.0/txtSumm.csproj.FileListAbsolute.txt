@@ -140,3 +140,4 @@ D:\Abdallah Ashraf\programming projects\text summarizer\txtSumm\txtSumm\obj\Debu
 D:\Abdallah Ashraf\programming projects\text summarizer\txtSumm\txtSumm\obj\Debug\net6.0\txtSumm.pdb
 D:\Abdallah Ashraf\programming projects\text summarizer\txtSumm\txtSumm\obj\Debug\net6.0\txtSumm.genruntimeconfig.cache
 D:\Abdallah Ashraf\programming projects\text summarizer\txtSumm\txtSumm\obj\Debug\net6.0\ref\txtSumm.dll
+D:\Abdallah Ashraf\programming projects\text summarizer\txtSumm\txtSumm\obj\Debug\net6.0\txtSumm.sourcelink.json

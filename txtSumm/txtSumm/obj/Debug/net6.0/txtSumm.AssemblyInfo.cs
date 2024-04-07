@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("txtSumm")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+435acdd5bcdb0c743fedcb88d2a9abf12521a5d4")]
 [assembly: System.Reflection.AssemblyProductAttribute("txtSumm")]
 [assembly: System.Reflection.AssemblyTitleAttribute("txtSumm")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

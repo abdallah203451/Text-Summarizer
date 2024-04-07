@@ -30,6 +30,9 @@ namespace txtSumm.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Text")
                         .HasColumnType("nvarchar(max)");
 
@@ -79,6 +82,9 @@ namespace txtSumm.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Token")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserName")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");

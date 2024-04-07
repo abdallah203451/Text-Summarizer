@@ -1,7 +1,9 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using System.Numerics;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 using NETCore.MailKit.Core;
 using txtSumm.Context;
 using txtSumm.Helpers;
+using txtSumm.Migrations;
 using txtSumm.Models;
 using txtSumm.Models.Dto;
 using txtSumm.UtilityService;
@@ -53,14 +56,26 @@ namespace txtSumm.Controllers
 			var newAccessToken = user.Token;
 			var newRefreshToken = CreateRefreshToken();
 			user.RefreshToken = newRefreshToken;
-			user.RefreshTokenExpiryTime = DateTime.Now.AddHours(1);
+			user.RefreshTokenExpiryTime = DateTime.UtcNow.AddHours(1);
 			await _authContext.SaveChangesAsync();
 
-			return Ok(new TokenApiDto()
+
+			return Ok(new returnLoginDto()
 			{
+				Email = user.Email,
+				Phone = user.Phone,
+				UserName = user.UserName,
 				AccessToken = newAccessToken,
 				RefreshToken = newRefreshToken
 			});
+
+			//return Ok(new TokenApiDto()
+			//{
+			//	AccessToken = newAccessToken,
+			//	RefreshToken = newRefreshToken
+			//});
+
+			//return Ok("successful login");
 		}
 
 		[HttpPost("register")]
@@ -89,15 +104,71 @@ namespace txtSumm.Controllers
 
 			userObj.Role = "User";
 			userObj.Token = "";
-
+			userObj.Token = CreateJwt(userObj);
+			var newAccessToken = userObj.Token;
+			var newRefreshToken = CreateRefreshToken();
+			userObj.RefreshToken = newRefreshToken;
+			userObj.RefreshTokenExpiryTime = DateTime.UtcNow.AddHours(1);
 			// Add the data to the database and save the changes
 			await _authContext.Users.AddAsync(userObj);
 			await _authContext.SaveChangesAsync();
-			return Ok(new
+			return Ok(new returnLoginDto()
 			{
-				Message = "Registered Successfully !"
+				Email = userObj.Email,
+				Phone = userObj.Phone,
+				UserName = userObj.UserName,
+				AccessToken = newAccessToken,
+				RefreshToken = newRefreshToken
 			});
 		}
+
+		[Authorize]
+		[HttpPut("edituser")]
+		public async Task<IActionResult> EditProfile([FromBody] User userObj)
+		{
+			var user = await _authContext.Users.FirstOrDefaultAsync(x => x.Email == userObj.Email);
+
+			if (user == null)
+				return NotFound(new
+				{
+					Message = "user not found"
+				});
+
+			user.Phone = userObj.Phone;
+			user.UserName = userObj.UserName;
+
+			_authContext.Users.Update(user);
+			_authContext.SaveChanges();
+
+			return Ok(new
+			{
+				Message = "Edited Successfully"
+			});
+		}
+
+		[Authorize]
+		[HttpGet("getuser")]
+		public async Task<IActionResult> GetUser(User userObj)
+		{
+			var user = await _authContext.Users.FirstOrDefaultAsync(a => a.Email == userObj.Email);
+			if (user is null)
+			{
+				return NotFound(new
+				{
+					StatusCode = 404,
+					Message = "User Doesn't Exist"
+				});
+			}
+			return Ok(new returnLoginDto()
+			{
+				Email = user.Email,
+				Phone = user.Phone,
+				UserName = user.UserName,
+				AccessToken = "",
+				RefreshToken = ""
+			});
+		}
+
 
 		//private Task<bool> CheckUserNameExistAsync(string username) => _authContext.Users.AnyAsync(x => x.Username == username);
 
@@ -118,7 +189,7 @@ namespace txtSumm.Controllers
 			var tokenDescriptor = new SecurityTokenDescriptor
 			{
 				Subject = identity,
-				Expires = DateTime.Now.AddHours(1),
+				Expires = DateTime.UtcNow.AddHours(1),
 				SigningCredentials = credentials
 			};
 			var token = jwtTokenHandler.CreateToken(tokenDescriptor);
